@@ -1,4 +1,5 @@
 package org.efimov;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -11,16 +12,33 @@ public class Client {
     private static Scanner scannerConsole;
     private static Socket clientSocket = null;
 
-    public static void main(String[] args) throws IOException {
 
-        clientSocket = getSettings();
-        assert clientSocket != null;
-        outMess = new PrintWriter(clientSocket.getOutputStream(), true);
-        inMess = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        scannerConsole = new Scanner(System.in);
+    public static Socket getSettings() {
+        String settings = "Client/settings.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(settings))) {
+            String ip = reader.readLine();
+            int port = Integer.parseInt(reader.readLine());
+            return new Socket(ip, port);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void start() {
+        try {
+            clientSocket = getSettings();
+            assert clientSocket != null;
+
+            outMess = new PrintWriter(clientSocket.getOutputStream(), true);
+            inMess = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            scannerConsole = new Scanner(System.in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         AtomicBoolean flag = new AtomicBoolean(true);
-
 
         new Thread(() -> {
             try {
@@ -59,21 +77,5 @@ public class Client {
                 }
             }
         }).start();
-
     }
-
-
-    public static Socket getSettings() {
-        String settings = "C:\\Users\\Сергей\\IdeaProjects\\MultiThreading\\ClientServerApp\\Client\\settings.txt";
-        try (BufferedReader reader = new BufferedReader(new FileReader(settings))) {
-            String ip = reader.readLine();
-            int port = Integer.parseInt(reader.readLine());
-            return new Socket(ip,port);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }

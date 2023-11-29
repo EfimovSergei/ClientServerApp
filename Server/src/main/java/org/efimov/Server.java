@@ -11,20 +11,6 @@ public class Server {
 
     private static List<PrintWriter> clients = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException {
-
-
-        ServerSocket serverSocket = getSettings();
-        System.out.println("Start server..... ");
-        while (true) {
-            Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            clients.add(out);
-            Thread clientThread = new Thread(new ClientHandler(clientSocket, out, clients));
-            clientThread.start();
-        }
-    }
-
 
     public static void broadcast(String message, PrintWriter sender, List<PrintWriter> clients) {
         for (PrintWriter client : clients) {
@@ -35,7 +21,7 @@ public class Server {
     }
 
     public static ServerSocket getSettings() {
-        String settings = "C:\\Users\\Сергей\\IdeaProjects\\MultiThreading\\ClientServerApp\\Server\\settings.txt";
+        String settings = "Server/settings.txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(settings))) {
             int port = Integer.parseInt(reader.readLine());
             return new ServerSocket(port);
@@ -44,5 +30,22 @@ public class Server {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void start() {
+        ServerSocket serverSocket = getSettings();
+        System.out.println("Start server..... ");
+        while (true) {
+            Socket clientSocket = null;
+            try {
+                clientSocket = serverSocket.accept();
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                clients.add(out);
+                Thread clientThread = new Thread(new ClientHandler(clientSocket, out, clients));
+                clientThread.start();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

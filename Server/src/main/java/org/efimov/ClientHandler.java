@@ -27,7 +27,7 @@ public class ClientHandler implements Runnable {
             String clientName = in.readLine();
             out.println("Your name: " + clientName + ".\n"
                     + "All needs your message!");
-            try (PrintWriter log = new PrintWriter(new FileWriter("C:\\Users\\Сергей\\IdeaProjects\\MultiThreading\\ClientServerApp\\Server\\File.log", true))) {
+            try (PrintWriter log = new PrintWriter(new FileWriter("Server/File.log", true))) {
                 log.println(getCurrentDataTime() + " " + clientName + ": " + "Присоединился к чату");
             }
             System.out.println("Server: Подключение нового клиента - " + clientName);
